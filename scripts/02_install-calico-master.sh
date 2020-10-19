@@ -2,13 +2,11 @@
 set -e
 cd `dirname $0`
 
+export KUBECONFIG=$HOME/.kube/config
+export DATASTORE_TYPE=kubernetes
+
 # Congirue k8s as calico's datastore
 kubectl apply -f https://docs.projectcalico.org/manifests/crds.yaml
-wget https://github.com/projectcalico/calicoctl/releases/download/v3.14.0/calicoctl
-chmod +x calicoctl
-mv calicoctl /usr/local/bin/
-
-# Install calicoctl
 wget https://github.com/projectcalico/calicoctl/releases/download/v3.14.0/calicoctl
 chmod +x calicoctl
 mv calicoctl /usr/local/bin/
@@ -59,17 +57,18 @@ kubectl config set-cluster kubernetes \
     --certificate-authority=/etc/kubernetes/pki/ca.crt \
     --embed-certs=true \
     --server=$APISERVER \
-    --kubeconfig=cni.kubeconfig
+    --kubeconfig=$HOME/cni.kubeconfig
 kubectl config set-credentials calico-cni \
     --client-certificate=cni.crt \
     --client-key=cni.key \
     --embed-certs=true \
-    --kubeconfig=cni.kubeconfig
+    --kubeconfig=$HOME/cni.kubeconfig
 kubectl config set-context default \
     --cluster=kubernetes \
     --user=calico-cni \
-    --kubeconfig=cni.kubeconfig
-kubectl config use-context default --kubeconfig=cni.kubeconfig
+    --kubeconfig=$HOME/cni.kubeconfig
+kubectl config use-context default --kubeconfig=$HOME/cni.kubeconfig
+chown vagrant:vagrant $HOME/cni.kubeconfig
 
 kubectl apply -f - <<EOF
 kind: ClusterRole
@@ -120,7 +119,7 @@ curl -L -o /opt/cni/bin/calico-ipam https://github.com/projectcalico/cni-plugin/
 chmod 755 /opt/cni/bin/calico-ipam
 
 mkdir -p /etc/cni/net.d/
-cp cni.kubeconfig /etc/cni/net.d/calico-kubeconfig
+cp $HOME/cni.kubeconfig /etc/cni/net.d/calico-kubeconfig
 chmod 600 /etc/cni/net.d/calico-kubeconfig
 
 cat > /etc/cni/net.d/10-calico.conflist <<EOF
