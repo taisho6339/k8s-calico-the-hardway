@@ -1,16 +1,17 @@
 #!/bin/sh
+set -e
+cd `dirname $0`
 
 # Congirue k8s as calico's datastore
 kubectl apply -f https://docs.projectcalico.org/manifests/crds.yaml
 wget https://github.com/projectcalico/calicoctl/releases/download/v3.14.0/calicoctl
 chmod +x calicoctl
-sudo mv calicoctl /usr/local/bin/
-export DATASTORE_TYPE=kubernetes
+mv calicoctl /usr/local/bin/
 
 # Install calicoctl
 wget https://github.com/projectcalico/calicoctl/releases/download/v3.14.0/calicoctl
 chmod +x calicoctl
-sudo mv calicoctl /usr/local/bin/
+mv calicoctl /usr/local/bin/
 
 # Congirue IPPools for Calico
 cat > pool1.yaml <<EOF
@@ -46,13 +47,13 @@ openssl req -newkey rsa:4096 \
            -nodes \
            -out cni.csr \
            -subj "/CN=calico-cni"
-sudo openssl x509 -req -in cni.csr \
+openssl x509 -req -in cni.csr \
                   -CA /etc/kubernetes/pki/ca.crt \
                   -CAkey /etc/kubernetes/pki/ca.key \
                   -CAcreateserial \
                   -out cni.crt \
                   -days 365
-sudo chown vagrant:vagrant cni.crt
+chown vagrant:vagrant cni.crt
 APISERVER=$(kubectl config view -o jsonpath='{.clusters[0].cluster.server}')
 kubectl config set-cluster kubernetes \
     --certificate-authority=/etc/kubernetes/pki/ca.crt \
@@ -113,7 +114,6 @@ rules:
 EOF
 
 ## Install CNI Plugin
-sudo su
 curl -L -o /opt/cni/bin/calico https://github.com/projectcalico/cni-plugin/releases/download/v3.14.0/calico-amd64
 chmod 755 /opt/cni/bin/calico
 curl -L -o /opt/cni/bin/calico-ipam https://github.com/projectcalico/cni-plugin/releases/download/v3.14.0/calico-ipam-amd64
@@ -151,5 +151,3 @@ cat > /etc/cni/net.d/10-calico.conflist <<EOF
   ]
 }
 EOF
-
-exit

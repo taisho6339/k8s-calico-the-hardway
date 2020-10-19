@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+cd `dirname $0`
 
 openssl req -newkey rsa:4096 \
            -keyout calico-node.key \

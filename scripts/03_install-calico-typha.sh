@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+cd `dirname $0`
 
 openssl req -x509 -newkey rsa:4096 \
                   -keyout typhaca.key \

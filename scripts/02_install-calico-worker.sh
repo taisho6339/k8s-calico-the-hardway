@@ -1,9 +1,10 @@
 #!/bin/sh
+set -e
+cd `dirname $0`
 
 ## Install CNI Plugin
 sshpass -p "vagrant" scp -o StrictHostKeyChecking=no vagrant@192.168.254.10:/home/vagrant/cni.kubeconfig .
 
-sudo su
 curl -L -o /opt/cni/bin/calico https://github.com/projectcalico/cni-plugin/releases/download/v3.14.0/calico-amd64
 chmod 755 /opt/cni/bin/calico
 curl -L -o /opt/cni/bin/calico-ipam https://github.com/projectcalico/cni-plugin/releases/download/v3.14.0/calico-ipam-amd64
@@ -41,5 +42,3 @@ cat > /etc/cni/net.d/10-calico.conflist <<EOF
   ]
 }
 EOF
-
-exit
