@@ -111,6 +111,7 @@ rules:
       - get
       - list
 EOF
+kubectl create clusterrolebinding calico-cni --clusterrole=calico-cni --user=calico-cni
 
 ## Install CNI Plugin
 curl -L -o /opt/cni/bin/calico https://github.com/projectcalico/cni-plugin/releases/download/v3.14.0/calico-amd64
